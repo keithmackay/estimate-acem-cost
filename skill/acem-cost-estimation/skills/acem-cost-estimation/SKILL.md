@@ -149,37 +149,27 @@ instead of a single figure. **Always report this range to the user, not the
 point estimate**, whenever any input is uncertain enough to express as a
 distribution — which in practice is almost always true pre-calibration.
 
-Add `--breakdown` to also get per-group and per-track p10/p50/p90 (off by
-default, since it's more output than most estimates need — ask the user if
-they want this level of detail before turning it on for a multi-track
-pipeline).
-
-When passing `--calibration-log`, its warnings are both printed to stderr
-*and* included in the JSON output as `calibration_warnings` (an empty list
-when everything's healthy) — read that field rather than parsing stderr if
-you're consuming the output programmatically.
-
-**Other advanced input features** (all optional, all backward compatible with
-plain numbers):
-
-| Feature | How | Addresses |
-|---|---|---|
-| Non-stationary rejection rate/retries | `{"start": a, "end": b}` — interpolated linearly across the group's `position_factor` | agents plausibly get better/worse over a project; a constant r_i can't capture that |
-| Context growth model | top-level `"context_model": "linear" \| "sublinear" \| "capped"` (+ optional `"context_cap"`) | linear CF overestimates cost for agents with context compression/summarization |
-| Parallel pipelines | tag each group with `"track": "backend"` etc. — output reports per-track subtotals | ACEM's sequential-pipeline assumption doesn't fit fan-out/subagent architectures; run each track's `position_factor` relative to *its own* length, and set CF-reset (`position_factor` back near 0) at track boundaries if context isn't shared across tracks |
-| LLM-perceived complexity | add `"llm_complexity_score"` (see `llm_complexity_score()`/`llm_complexity_tier()` helpers in the script) | human-judged Simple/Medium/Complex correlates weakly with actual token cost (paper's own cited evidence) — use this as a check on, not a replacement for, the human-judged tier |
-| Calibration confidence/staleness | add `"sample_size"` and `"calibrated_date"` (YYYY-MM-DD) per group, or maintain a calibration log (`references/calibration_log_example.json`) and pass `--calibration-log path.json` | tells the reader whether a number is calibrated, a small pilot, or a cold-start guess, and flags constants overdue for recalibration or calibrated against a now-superseded agent version |
+For per-group/per-track Monte Carlo detail, embedding calibration warnings
+in the JSON output, non-stationary parameters, alternative context-growth
+curves, parallel pipelines, or an LLM-perceived complexity check, see
+`references/advanced-features.md` — situational features, not needed for a
+basic estimate.
 
 ### 8. Report
 
-Never present a single dollar figure as if it were precise. Lead with the
-Monte Carlo p10/p50/p90 range when inputs are uncertain (the normal case).
-State every assumed constant explicitly, and surface each group's
-`confidence` label and any `--calibration-log` warnings so the reader can
-tell a calibrated number from a cold-start guess. Include: total cost range,
-C_LLM vs C_HITL split, per-track subtotals if the pipeline is parallel, which
-inputs the estimate is most sensitive to (usually rejection rate and RF), and
-what pilot data would sharpen it.
+Lead with the Monte Carlo p10/p50/p90 range whenever inputs are uncertain
+(the normal case) — treat that range as the headline number, not a single
+point estimate. Every report should include:
+
+- Total cost range (p10/p50/p90), not a single figure
+- C_LLM vs C_HITL split
+- Per-track subtotals, if the pipeline is parallel
+- Every assumed constant, stated explicitly
+- Each group's `confidence` label and any `--calibration-log` warnings, so
+  the reader can tell a calibrated number from a cold-start guess
+- Which inputs the estimate is most sensitive to (usually rejection rate
+  and RF)
+- What pilot data would sharpen the estimate
 
 ## Common Mistakes
 
