@@ -214,6 +214,37 @@ class TestAcemCostMonteCarlo(unittest.TestCase):
         self.assertEqual(out["Total_Cost"]["p10"], out["Total_Cost"]["p90"])
         self.assertEqual(out["Total_Cost"]["p50"], 3184.0)
 
+    def test_non_stationary_alpha_resolved_per_group_like_point_estimate(self):
+        # Finding #4 (docs/reviews/2026-08-04-improve-this.md): acem_cost
+        # resolves a non-stationary alpha ({start,end}) at *each group's own*
+        # position_factor. acem_cost_monte_carlo must do the same, not
+        # resolve alpha once at a hardcoded position. With no {low,mode,high}
+        # distributions anywhere, MC of a deterministic input should
+        # collapse to exactly the point-estimate Total_Cost — this is the
+        # same invariant as test_deterministic_input_collapses_distribution,
+        # applied to a case with two groups at very different pipeline
+        # positions, which is what actually exposes the bug.
+        groups = [
+            {
+                "name": "early", "base_in": 10000, "base_out": 3000, "count": 10,
+                "rejection_rate": 0.2, "retries_per_rejection": 1.5,
+                "review_checkpoints_per_unit": 1, "review_hours": 0.2,
+                "rework_hours": 0.4, "position_factor": 0.0,
+            },
+            {
+                "name": "late", "base_in": 10000, "base_out": 3000, "count": 10,
+                "rejection_rate": 0.2, "retries_per_rejection": 1.5,
+                "review_checkpoints_per_unit": 1, "review_hours": 0.2,
+                "rework_hours": 0.4, "position_factor": 1.0,
+            },
+        ]
+        alpha_spec = {"start": 0.0, "end": 1.0}
+        point = acem.acem_cost(groups, alpha_spec, 2.0, 10.0, 75)
+        mc = acem.acem_cost_monte_carlo(groups, alpha_spec, 2.0, 10.0, 75,
+                                         n_samples=50, seed=3)
+        self.assertEqual(mc["Total_Cost"]["p10"], mc["Total_Cost"]["p90"])
+        self.assertEqual(mc["Total_Cost"]["p50"], point["Total_Cost"])
+
     def test_seed_reproducibility(self):
         out1 = acem.acem_cost_monte_carlo(
             self.cfg["groups"], self.cfg["alpha"],

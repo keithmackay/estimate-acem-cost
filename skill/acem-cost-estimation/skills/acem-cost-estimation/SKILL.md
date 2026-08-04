@@ -12,7 +12,11 @@ Engineering") models agentic dev cost as `Total_Cost = C_LLM + C_HITL + C_Infra`
 token consumption cost, human-in-the-loop review/rework cost, and infrastructure
 cost. It uses two corrective multipliers — Revision Factor (RF, retry overhead)
 and Context Factor (CF, context accumulation) — and a HITL Intensity Score (HIS)
-to classify oversight level. Full paper: `references/acem-paper-summary.md`.
+to classify oversight level. Condensed formula reference:
+`references/acem-paper-summary.md` (the full paper is
+[arXiv:2608.02582](https://arxiv.org/abs/2608.02582); its PDF isn't bundled
+with this skill, so it's not reachable from a standalone Codex/Antigravity/
+Gemini CLI install — only the summary is).
 
 **This skill runs ACEM in reverse of its primary design**: the paper sizes a
 *planned* project from Use Case/Story/Function Points. Here you're sizing an
@@ -98,6 +102,10 @@ assume 1.5 retries/rejection as a starting point. Typical range: RF ≈ 1.2
 0.5–0.8 for long monolithic pipelines with full history carried forward. Use
 the *average* i/N (≈0.5–0.65) across all tasks if you're not modeling per-task
 position.
+
+This is the paper's default linear model; `sublinear`/`capped` alternatives
+exist for agents with context compression or summarization — see
+`context_model` in Step 7.
 
 ### 5. Estimate HITL cost
 

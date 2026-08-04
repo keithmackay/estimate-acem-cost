@@ -165,6 +165,12 @@ def acem_cost(groups, alpha_spec, price_in_per_m, price_out_per_m,
     tracks = {}
     total_llm = 0.0
     total_hitl = 0.0
+    # alpha is pipeline-level, not group-level: when given as a plain
+    # constant it doesn't vary by position, so resolve it once rather than
+    # redundantly on every group. Dict specs ({start,end} or
+    # {low,mode,high}) may genuinely vary by position, so those still
+    # resolve per group inside the loop.
+    static_alpha = alpha_spec if isinstance(alpha_spec, (int, float)) else None
 
     for g in groups:
         pos = g.get("position_factor", 0.5)
@@ -172,7 +178,7 @@ def acem_cost(groups, alpha_spec, price_in_per_m, price_out_per_m,
 
         rejection_rate = _resolve(g["rejection_rate"], pos)
         retries = _resolve(g["retries_per_rejection"], pos)
-        alpha = _resolve(alpha_spec, pos)
+        alpha = static_alpha if static_alpha is not None else _resolve(alpha_spec, pos)
 
         rf = 1 + (rejection_rate * retries)
         cf = context_factor(alpha, pos, model=context_model, cap=context_cap)
@@ -246,11 +252,16 @@ def acem_cost_monte_carlo(groups, alpha_spec, price_in_per_m, price_out_per_m,
     for _ in range(n_samples):
         total_llm = 0.0
         total_hitl = 0.0
-        alpha = _sample(alpha_spec, 0.5, rng)
         for g in groups:
             pos = g.get("position_factor", 0.5)
             rejection_rate = _sample(g["rejection_rate"], pos, rng)
             retries = _sample(g["retries_per_rejection"], pos, rng)
+            # Resolve alpha at this group's own position, matching
+            # acem_cost's per-group resolution (see Finding #4,
+            # docs/reviews/2026-08-04-improve-this.md) — a non-stationary
+            # alpha must vary by pipeline position the same way in both
+            # the point-estimate and Monte Carlo paths.
+            alpha = _sample(alpha_spec, pos, rng)
 
             rf = 1 + (rejection_rate * retries)
             cf = context_factor(alpha, pos, model=context_model, cap=context_cap)
