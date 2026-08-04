@@ -245,13 +245,23 @@ def acem_cost(groups, alpha_spec, price_in_per_m, price_out_per_m,
 
 def acem_cost_monte_carlo(groups, alpha_spec, price_in_per_m, price_out_per_m,
                            reviewer_rate, infra_cost=0.0, context_model="linear",
-                           context_cap=None, n_samples=2000, seed=None):
+                           context_cap=None, n_samples=2000, seed=None,
+                           detail=False):
+    """detail=True (Finding #6, docs/reviews/2026-08-04-improve-this.md,
+    opt-in per user decision) additionally reports per-group and per-track
+    C_LLM/C_HITL percentiles alongside the aggregate totals. Off by default
+    to keep ordinary output small — pass detail=True when you need a
+    distributional breakdown by group or track, not just in aggregate."""
     rng = random.Random(seed)
     totals, llm_totals, hitl_totals = [], [], []
+    group_llm = {g["name"]: [] for g in groups} if detail else None
+    group_hitl = {g["name"]: [] for g in groups} if detail else None
+    track_subtotal = {} if detail else None
 
     for _ in range(n_samples):
         total_llm = 0.0
         total_hitl = 0.0
+        sample_track_subtotal = {} if detail else None
         for g in groups:
             pos = g.get("position_factor", 0.5)
             rejection_rate = _sample(g["rejection_rate"], pos, rng)
@@ -274,20 +284,33 @@ def acem_cost_monte_carlo(groups, alpha_spec, price_in_per_m, price_out_per_m,
                 g["review_hours"] * reviewer_rate
             c_rework = g["count"] * rejection_rate * \
                 g["rework_hours"] * reviewer_rate
+            c_hitl = c_review + c_rework
 
             total_llm += c_llm
-            total_hitl += c_review + c_rework
+            total_hitl += c_hitl
+
+            if detail:
+                group_llm[g["name"]].append(c_llm)
+                group_hitl[g["name"]].append(c_hitl)
+                track = g.get("track", "main")
+                sample_track_subtotal[track] = sample_track_subtotal.get(track, 0.0) + c_llm + c_hitl
 
         totals.append(total_llm + total_hitl + infra_cost)
         llm_totals.append(total_llm)
         hitl_totals.append(total_hitl)
+        if detail:
+            for track, subtotal in sample_track_subtotal.items():
+                track_subtotal.setdefault(track, []).append(subtotal)
 
     def pctl(data, p):
         s = sorted(data)
         idx = min(len(s) - 1, max(0, round(p / 100 * (len(s) - 1))))
         return round(s[idx], 2)
 
-    return {
+    def pctl_summary(data):
+        return {"p10": pctl(data, 10), "p50": pctl(data, 50), "p90": pctl(data, 90)}
+
+    result = {
         "n_samples": n_samples,
         "Total_Cost": {
             "p10": pctl(totals, 10), "p50": pctl(totals, 50), "p90": pctl(totals, 90),
@@ -302,6 +325,18 @@ def acem_cost_monte_carlo(groups, alpha_spec, price_in_per_m, price_out_per_m,
         },
     }
 
+    if detail:
+        result["groups"] = {
+            name: {"C_LLM": pctl_summary(group_llm[name]), "C_HITL": pctl_summary(group_hitl[name])}
+            for name in group_llm
+        }
+        result["tracks"] = {
+            track: {"subtotal": pctl_summary(samples)}
+            for track, samples in track_subtotal.items()
+        }
+
+    return result
+
 
 # ---------------------------------------------------------------------------
 # CLI
@@ -313,6 +348,9 @@ def main():
     parser.add_argument("--montecarlo", type=int, metavar="N",
                          help="run a Monte Carlo simulation with N samples instead of a point estimate")
     parser.add_argument("--seed", type=int, default=None, help="RNG seed for --montecarlo (reproducibility)")
+    parser.add_argument("--breakdown", action="store_true",
+                         help="with --montecarlo, also report per-group and per-track cost percentiles "
+                              "(off by default; aggregate-only output is smaller)")
     parser.add_argument("--calibration-log", metavar="PATH",
                          help="check a calibration log for stale/underpowered constants and print warnings")
     parser.add_argument("--context-model", choices=["linear", "sublinear", "capped"], default=None,
@@ -325,11 +363,12 @@ def main():
     context_model = args.context_model or cfg.get("context_model", "linear")
     context_cap = cfg.get("context_cap")
 
+    calibration_warnings = None
     if args.calibration_log:
-        warnings = check_calibration_log(args.calibration_log)
-        if warnings:
+        calibration_warnings = check_calibration_log(args.calibration_log)
+        if calibration_warnings:
             print("Calibration warnings:", file=sys.stderr)
-            for w in warnings:
+            for w in calibration_warnings:
                 print(f"  - {w}", file=sys.stderr)
         else:
             print("Calibration log: all constants within freshness/sample-size thresholds.", file=sys.stderr)
@@ -339,7 +378,7 @@ def main():
             cfg["groups"], cfg["alpha"], cfg["price_in_per_m"], cfg["price_out_per_m"],
             cfg["reviewer_rate"], cfg.get("infra_cost", 0.0),
             context_model=context_model, context_cap=context_cap,
-            n_samples=args.montecarlo, seed=args.seed,
+            n_samples=args.montecarlo, seed=args.seed, detail=args.breakdown,
         )
     else:
         out = acem_cost(
@@ -347,6 +386,9 @@ def main():
             cfg["reviewer_rate"], cfg.get("infra_cost", 0.0),
             context_model=context_model, context_cap=context_cap,
         )
+
+    if calibration_warnings is not None:
+        out["calibration_warnings"] = calibration_warnings
 
     print(json.dumps(out, indent=2))
 

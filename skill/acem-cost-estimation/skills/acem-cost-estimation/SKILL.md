@@ -149,6 +149,16 @@ instead of a single figure. **Always report this range to the user, not the
 point estimate**, whenever any input is uncertain enough to express as a
 distribution — which in practice is almost always true pre-calibration.
 
+Add `--breakdown` to also get per-group and per-track p10/p50/p90 (off by
+default, since it's more output than most estimates need — ask the user if
+they want this level of detail before turning it on for a multi-track
+pipeline).
+
+When passing `--calibration-log`, its warnings are both printed to stderr
+*and* included in the JSON output as `calibration_warnings` (an empty list
+when everything's healthy) — read that field rather than parsing stderr if
+you're consuming the output programmatically.
+
 **Other advanced input features** (all optional, all backward compatible with
 plain numbers):
 

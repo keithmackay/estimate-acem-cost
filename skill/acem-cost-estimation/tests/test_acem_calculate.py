@@ -260,6 +260,113 @@ class TestAcemCostMonteCarlo(unittest.TestCase):
         )
         self.assertEqual(out1, out2)
 
+    def test_detail_false_by_default_omits_group_and_track_breakdown(self):
+        # Finding #6 (docs/reviews/2026-08-04-improve-this.md): opt-in only,
+        # per user decision, so default output stays aggregate-only.
+        out = acem.acem_cost_monte_carlo(
+            self.cfg["groups"], self.cfg["alpha"],
+            self.cfg["price_in_per_m"], self.cfg["price_out_per_m"],
+            self.cfg["reviewer_rate"], self.cfg.get("infra_cost", 0.0),
+            n_samples=50, seed=1,
+        )
+        self.assertNotIn("groups", out)
+        self.assertNotIn("tracks", out)
+
+    def test_detail_true_reports_per_group_and_per_track_percentiles(self):
+        out = acem.acem_cost_monte_carlo(
+            self.cfg["groups"], self.cfg["alpha"],
+            self.cfg["price_in_per_m"], self.cfg["price_out_per_m"],
+            self.cfg["reviewer_rate"], self.cfg.get("infra_cost", 0.0),
+            n_samples=50, seed=1, detail=True,
+        )
+        group_names = {g["name"] for g in self.cfg["groups"]}
+        self.assertEqual(set(out["groups"].keys()), group_names)
+        for name in group_names:
+            for key in ("C_LLM", "C_HITL"):
+                self.assertIn("p10", out["groups"][name][key])
+                self.assertIn("p50", out["groups"][name][key])
+                self.assertIn("p90", out["groups"][name][key])
+        self.assertEqual(set(out["tracks"].keys()), {"main"})
+        self.assertIn("p50", out["tracks"]["main"]["subtotal"])
+
+    def test_detail_true_aggregate_totals_match_detail_false(self):
+        # Turning on detail must not change the aggregate numbers.
+        kwargs = dict(
+            groups=self.cfg["groups"], alpha_spec=self.cfg["alpha"],
+            price_in_per_m=self.cfg["price_in_per_m"],
+            price_out_per_m=self.cfg["price_out_per_m"],
+            reviewer_rate=self.cfg["reviewer_rate"],
+            infra_cost=self.cfg.get("infra_cost", 0.0),
+            n_samples=50, seed=9,
+        )
+        without_detail = acem.acem_cost_monte_carlo(**kwargs)
+        with_detail = acem.acem_cost_monte_carlo(**kwargs, detail=True)
+        self.assertEqual(without_detail["Total_Cost"], with_detail["Total_Cost"])
+        self.assertEqual(without_detail["C_LLM_total"], with_detail["C_LLM_total"])
+        self.assertEqual(without_detail["C_HITL_total"], with_detail["C_HITL_total"])
+
+
+class TestMainCalibrationWarningsInOutput(unittest.TestCase):
+    """Finding #9 (docs/reviews/2026-08-04-improve-this.md): calibration
+    warnings should be embedded in the JSON output (calibration_warnings),
+    not only printed to stderr, so downstream consumers of the JSON don't
+    lose the signal."""
+
+    def _write_log(self, constants):
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        json.dump({"constants": constants}, f)
+        f.close()
+        self.addCleanup(os.unlink, f.name)
+        return f.name
+
+    def _write_input(self):
+        input_path = os.path.join(
+            os.path.dirname(__file__), "..", "references", "example_input.json")
+        with open(input_path) as f:
+            cfg = json.load(f)
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        json.dump(cfg, f)
+        f.close()
+        self.addCleanup(os.unlink, f.name)
+        return f.name
+
+    def test_output_carries_calibration_warnings_list(self):
+        import subprocess
+        log_path = self._write_log([{"name": "beta", "sample_size": 1, "calibrated_date": None}])
+        input_path = self._write_input()
+        script = os.path.join(os.path.dirname(__file__), "..", "acem_calculate.py")
+        result = subprocess.run(
+            [sys.executable, script, input_path, "--calibration-log", log_path],
+            capture_output=True, text=True, check=True)
+        out = json.loads(result.stdout)
+        self.assertIn("calibration_warnings", out)
+        self.assertEqual(len(out["calibration_warnings"]), 1)
+        self.assertIn("only 1 pilot samples", out["calibration_warnings"][0])
+
+    def test_output_calibration_warnings_empty_when_healthy(self):
+        import subprocess
+        today = datetime.date(2026, 8, 4).isoformat()
+        log_path = self._write_log([{
+            "name": "alpha", "sample_size": 12, "calibrated_date": today,
+        }])
+        input_path = self._write_input()
+        script = os.path.join(os.path.dirname(__file__), "..", "acem_calculate.py")
+        result = subprocess.run(
+            [sys.executable, script, input_path, "--calibration-log", log_path],
+            capture_output=True, text=True, check=True)
+        out = json.loads(result.stdout)
+        self.assertEqual(out["calibration_warnings"], [])
+
+    def test_output_omits_calibration_warnings_when_no_log_passed(self):
+        import subprocess
+        input_path = self._write_input()
+        script = os.path.join(os.path.dirname(__file__), "..", "acem_calculate.py")
+        result = subprocess.run(
+            [sys.executable, script, input_path],
+            capture_output=True, text=True, check=True)
+        out = json.loads(result.stdout)
+        self.assertNotIn("calibration_warnings", out)
+
 
 if __name__ == "__main__":
     unittest.main()
