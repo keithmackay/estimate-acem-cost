@@ -1,0 +1,54 @@
+{
+  "context_model": "sublinear",
+  "alpha": {"low": 0.3, "mode": 0.45, "high": 0.7},
+  "price_in_per_m": 2.0,
+  "price_out_per_m": 10.0,
+  "reviewer_rate": 75,
+  "infra_cost": 20,
+  "groups": [
+    {
+      "name": "function_impl_simple",
+      "track": "backend",
+      "base_in": 8000,
+      "base_out": 3000,
+      "count": 40,
+      "rejection_rate": {"start": 0.25, "end": 0.1},
+      "retries_per_rejection": {"low": 1.2, "mode": 1.5, "high": 2.0},
+      "review_checkpoints_per_unit": 1,
+      "review_hours": 0.15,
+      "rework_hours": 0.3,
+      "position_factor": 0.4,
+      "sample_size": 12,
+      "calibrated_date": "2026-06-01"
+    },
+    {
+      "name": "function_impl_complex",
+      "track": "backend",
+      "base_in": 80000,
+      "base_out": 15000,
+      "count": 8,
+      "rejection_rate": {"start": 0.55, "end": 0.35},
+      "retries_per_rejection": {"low": 1.5, "mode": 1.8, "high": 2.4},
+      "review_checkpoints_per_unit": 1,
+      "review_hours": 1.0,
+      "rework_hours": 2.5,
+      "position_factor": 0.7,
+      "sample_size": 2,
+      "calibrated_date": "2026-03-15",
+      "llm_complexity_score": 125000
+    },
+    {
+      "name": "ui_component_medium",
+      "track": "frontend",
+      "base_in": 18000,
+      "base_out": 5000,
+      "count": 20,
+      "rejection_rate": 0.3,
+      "retries_per_rejection": 1.6,
+      "review_checkpoints_per_unit": 1,
+      "review_hours": 0.3,
+      "rework_hours": 0.6,
+      "position_factor": 0.3
+    }
+  ]
+}

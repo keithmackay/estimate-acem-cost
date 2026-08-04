@@ -1,0 +1,28 @@
+{
+  "constants": [
+    {
+      "name": "beta_function_impl_simple",
+      "value": {"in": 8200, "out": 2900},
+      "sample_size": 12,
+      "calibrated_date": "2026-06-01",
+      "agent_version": "claude-sonnet-5",
+      "current_agent_version": "claude-sonnet-5"
+    },
+    {
+      "name": "beta_function_impl_complex",
+      "value": {"in": 82000, "out": 15400},
+      "sample_size": 2,
+      "calibrated_date": "2026-03-15",
+      "agent_version": "claude-sonnet-4",
+      "current_agent_version": "claude-sonnet-5"
+    },
+    {
+      "name": "alpha_context_coefficient",
+      "value": 0.45,
+      "sample_size": 6,
+      "calibrated_date": "2026-05-20",
+      "agent_version": "claude-sonnet-5",
+      "current_agent_version": "claude-sonnet-5"
+    }
+  ]
+}
