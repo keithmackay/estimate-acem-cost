@@ -52,58 +52,28 @@ one attempt to take that invitation up. `docs/ACEM_OPPORTUNITIES.md` is our
 close reading of the paper's own stated limitations and future-work section,
 and the extensions below map directly onto opportunities it identifies.
 
-What this repo adds on top of the original model, and why:
+What this repo adds on top of the original model — each one implements an
+opportunity the paper itself names as a limitation or future-work item, not
+a speculative addition:
 
-- **Monte Carlo cost distributions** (`--montecarlo`). The paper flags, in
-  its discussion of non-determinism (Section 4.3), that "the appropriate
-  output of an agentic cost model may be a probability distribution over
-  costs, not a single figure," and names Monte Carlo simulation as a
-  high-priority future direction. We implemented that directly: any of
-  `rejection_rate`, `retries_per_rejection`, or `alpha` can be given as a
-  `{low, mode, high}` distribution, returning p10/p50/p90 cost bands instead
-  of a point estimate.
-- **Non-stationary rejection rates and alternative context-growth curves**
-  (`context_model: linear | sublinear | capped`). The paper names both of
-  these as simplifying assumptions it makes for tractability (Assumption A3
-  and the discussion after Equation 7), noting real agents may improve or
-  degrade over a project and that context growth may not be linear for
-  agents using compression or summarization. We made both swappable inputs
-  rather than fixed assumptions.
-- **An LLM-perceived complexity axis** (`llm_complexity_score()`). The paper
-  cites its own supporting evidence (Bai et al.; Xie et al.) that
-  human-judged task complexity correlates weakly with actual token
-  consumption, and names a second "LLM-perceived complexity" dimension
-  without fully operationalizing it (Section 3.2.2). We added a scorer so
-  the human-judged Simple/Medium/Complex tier can be checked against a
-  model-facing signal rather than trusted alone.
-- **Parallel-pipeline / per-track support** (`track` field). ACEM's Context
-  Factor assumes a single sequential pipeline (Assumption A1), which the
-  paper names as a scope boundary and an explicit direction for future work.
-  Multi-agent fan-out is increasingly the default architecture rather than
-  the exception, so we added per-track grouping and subtotals as a practical
-  approximation ahead of a fuller concurrent-context model.
-- **Calibration confidence and staleness tracking**
-  (`--calibration-log`, `confidence` labels). The paper is explicit that
-  every constant is symbolic pending calibration and warns that constants
-  must be recalibrated whenever the agent or model version changes
-  (Assumption A4). Nothing in the original model distinguishes a calibrated
-  number from a cold-start guess at the point of use, so we added
-  per-constant `sample_size`/`calibrated_date` tracking that flags entries
-  that are underpowered, stale, or tied to a superseded agent version.
-- **A retrospective (codebase-first) mode.** The paper's worked examples all
-  size a *planned* project from sizing metrics. Estimating what an
-  *already-built* codebase would have cost to build agentically — this
-  skill's primary use case — is a natural but unaddressed extension; we
-  built the artifact-inventory workflow needed to run ACEM in that
-  direction, and documented it clearly as an extension rather than
-  something the original paper claims to support.
+- Monte Carlo cost distributions (`--montecarlo`)
+- Non-stationary rejection rates and alternative context-growth curves
+  (`context_model: linear | sublinear | capped`)
+- An LLM-perceived complexity axis (`llm_complexity_score()`)
+- Parallel-pipeline / per-track support (`track` field)
+- Calibration confidence and staleness tracking (`--calibration-log`,
+  `confidence` labels)
+- A retrospective (codebase-first) mode — sizing an already-built codebase,
+  vs. the paper's planned-project-only worked examples
 
-Every one of these is exploratory tooling for testing ACEM's ideas, not a
-validated improvement — see the warning above and
-`docs/ACEM_OPPORTUNITIES.md` for the full analysis, including the one
-opportunity we can't implement ourselves: a real, multi-organization
-calibration dataset, which the paper itself names as the necessary next step
-for the whole model.
+**For the "why" behind each one — which paper section or assumption it
+addresses — see `docs/ACEM_OPPORTUNITIES.md` §5**, which is this repo's
+single source of truth for that rationale (this section intentionally
+doesn't repeat it). That document also covers the one opportunity we can't
+implement ourselves: a real, multi-organization calibration dataset, which
+the paper names as the necessary next step for the whole model. Every
+extension listed above is exploratory tooling for testing ACEM's ideas, not
+a validated improvement — see the warning above.
 
 ## Getting Started
 

@@ -188,6 +188,13 @@ that step is the single highest-leverage thing that could happen to it next.
    a `calibration_age_days` figure when a `calibrated_date` is supplied, so a
    calibrated number and a cold-start guess no longer look identical in the
    output.
+8. **A retrospective (codebase-first) mode.** ✅ *Implemented* — the paper's
+   worked examples all size a *planned* project from sizing metrics.
+   Estimating what an *already-built* codebase would have cost to build
+   agentically is a natural but unaddressed extension; this repo built the
+   artifact-inventory workflow (`SKILL.md` Steps 1–2) needed to run ACEM in
+   that direction, and documents it clearly as an extension rather than
+   something the original paper claims to support.
 
 Implementation: `skill/acem-cost-estimation/acem_calculate.py` and
 `skill/acem-cost-estimation/SKILL.md`. See
