@@ -104,6 +104,14 @@ This skill uses no Claude Code-specific frontmatter (`metadata`,
 there are no platform gaps to document. All four platforms run the same
 workflow and the same calculator.
 
+## Development
+
+Run the test suite (stdlib `unittest`, no dependencies):
+
+```bash
+python3 -m unittest discover -s tests
+```
+
 ## References
 
 - **Claude Code Skills:** https://code.claude.com/docs/en/skills
