@@ -40,6 +40,12 @@ but unvalidated extension of the model (see `references/opportunities.md`).
 Not for: estimating human-only dev cost (use COCOMO/Story Points instead — this
 model is specifically about agentic/LLM-driven development).
 
+## Flags
+
+### `--help`
+
+If the user invokes this skill with a `--help` flag (e.g. `/acem-cost-estimation --help`), do not run the procedure. Instead, read and display the contents of `help.md` (in this skill's folder) verbatim, then stop.
+
 ## Procedure
 
 ### 1. Inventory the codebase → artifact counts
