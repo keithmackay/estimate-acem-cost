@@ -205,6 +205,10 @@ This started as a personal exploration of the ACEM paper; issues and PRs
 that improve the calculator, extend the skill's codebase-inventory heuristics,
 or add real calibration data are welcome.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## License
 
 [MIT](LICENSE)
