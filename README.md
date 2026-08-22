@@ -87,6 +87,13 @@ a validated improvement — see the warning above.
 
 ### Installation
 
+#### From the mackayi marketplace (recommended)
+
+```
+/plugin marketplace add keithmackay/mackayi
+/plugin install estimate-acem-cost@mackayi
+```
+
 The skill lives at `skill/estimate-acem-cost/` and works natively on all
 four platforms — clone the repo first:
 

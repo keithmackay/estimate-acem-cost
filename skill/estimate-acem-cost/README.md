@@ -13,6 +13,13 @@ the ACEM (Agentic Cost Estimation Model) methodology.
 
 ## Installation
 
+### From the mackayi marketplace (recommended)
+
+```
+/plugin marketplace add keithmackay/mackayi
+/plugin install estimate-acem-cost@mackayi
+```
+
 ### Claude Code
 
 ```bash
