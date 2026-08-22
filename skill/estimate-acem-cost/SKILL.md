@@ -1,5 +1,5 @@
 ---
-name: acem-cost-estimation
+name: estimate-acem-cost
 description: Use when the user wants to estimate what it would have cost (time/dollars) for an AI coding agent to build an existing codebase, or wants a token+HITL cost forecast for a planned agentic software project — applies the ACEM (Agentic Cost Estimation Model) methodology.
 ---
 
@@ -44,14 +44,14 @@ model is specifically about agentic/LLM-driven development).
 
 ### `--help`
 
-If the user invokes this skill with a `--help` flag (e.g. `/acem-cost-estimation --help`), do not run the procedure. Instead, read and display the contents of `help.md` (in this skill's folder) verbatim, then stop.
+If the user invokes this skill with a `--help` flag (e.g. `/estimate-acem-cost --help`), do not run the procedure. Instead, read and display the contents of `help.md` (in this skill's folder) verbatim, then stop.
 
 ### `--version`
 
-If the user invokes this skill with a `--version` flag (e.g. `/acem-cost-estimation --version`), do not run the procedure. Instead:
+If the user invokes this skill with a `--version` flag (e.g. `/estimate-acem-cost --version`), do not run the procedure. Instead:
 
 1. Read the installed version from this skill's own manifest: `.claude-plugin/plugin.json` if present, else `.codex-plugin/plugin.json`, else `gemini-extension.json` — whichever exists for this platform install. If none exist (a bare Claude Code skill with only SKILL.md), read the topmost version heading in `CHANGELOG.md` instead.
-2. Print: `acem-cost-estimation v<installed-version>`
+2. Print: `estimate-acem-cost v<installed-version>`
 3. Best-effort update check — determine this skill's GitHub source repo:
    a. If `.git` exists here and `git remote get-url origin` resolves to a `github.com` URL, use that `owner/repo`.
    b. Otherwise, search this skill's own `README.md` for the first `https://github.com/<owner>/<repo>` URL and use that.

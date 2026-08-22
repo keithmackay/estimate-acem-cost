@@ -1,5 +1,5 @@
 {
-  "name": "acem-cost-estimation",
+  "name": "estimate-acem-cost",
   "description": "Use when the user wants to estimate what it would have cost (time/dollars) for an AI coding agent to build an existing codebase, or wants a token+HITL cost forecast for a planned agentic software project — applies the ACEM (Agentic Cost Estimation Model) methodology.",
   "version": "1.0.0",
   "contextFileName": "GEMINI.md"

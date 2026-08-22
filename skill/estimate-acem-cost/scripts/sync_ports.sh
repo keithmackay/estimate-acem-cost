@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerates the Codex/Gemini CLI port (skills/acem-cost-estimation/) from
+# Regenerates the Codex/Gemini CLI port (skills/estimate-acem-cost/) from
 # the canonical root files (SKILL.md, acem_calculate.py, references/).
 #
 # Run this after editing SKILL.md or acem_calculate.py, or after adding/
@@ -17,7 +17,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 SRC_FILES=(SKILL.md acem_calculate.py references)
-DEST="skills/acem-cost-estimation"
+DEST="skills/estimate-acem-cost"
 
 if [[ "${1:-}" == "--check" ]]; then
   tmp=$(mktemp -d)

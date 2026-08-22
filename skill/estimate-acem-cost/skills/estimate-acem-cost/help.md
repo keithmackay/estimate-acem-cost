@@ -1,4 +1,4 @@
-acem-cost-estimation — estimate AI-agent build cost (time/$) for a codebase, using the ACEM model
+estimate-acem-cost — estimate AI-agent build cost (time/$) for a codebase, using the ACEM model
 
 WHAT IT DOES
   (Experimental, unvalidated — see WARNING below.) Estimates what it
@@ -22,9 +22,9 @@ WHAT IT NEEDS
   - Python 3 available to run the bundled acem_calculate.py script
 
 USAGE
-  /acem-cost-estimation          Estimate cost for the current codebase
+  /estimate-acem-cost          Estimate cost for the current codebase
                                   or a described planned project
-  /acem-cost-estimation --help   Show this message and exit
+  /estimate-acem-cost --help   Show this message and exit
 
 FLAGS
   --help    Show this help message without making any changes

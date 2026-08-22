@@ -193,9 +193,9 @@ that step is the single highest-leverage thing that could happen to it next.
    that direction, and documents it clearly as an extension rather than
    something the original paper claims to support.
 
-Implementation: `skill/acem-cost-estimation/acem_calculate.py` and
-`skill/acem-cost-estimation/SKILL.md`. See
-`skill/acem-cost-estimation/references/example_input_advanced.json` for a
+Implementation: `skill/estimate-acem-cost/acem_calculate.py` and
+`skill/estimate-acem-cost/SKILL.md`. See
+`skill/estimate-acem-cost/references/example_input_advanced.json` for a
 worked example exercising all of #2–#7 together.
 
 > [!NOTE]

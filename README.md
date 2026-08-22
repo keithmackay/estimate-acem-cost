@@ -87,19 +87,19 @@ a validated improvement — see the warning above.
 
 ### Installation
 
-The skill lives at `skill/acem-cost-estimation/` and works natively on all
+The skill lives at `skill/estimate-acem-cost/` and works natively on all
 four platforms — clone the repo first:
 
 ```bash
-git clone https://github.com/keithmackay/estimator.git
+git clone https://github.com/keithmackay/estimate-acem-cost.git
 cd estimator
 ```
 
 **Claude Code** — symlink (or copy) into the personal skills directory:
 ```bash
-ln -s "$(pwd)/skill/acem-cost-estimation" ~/.claude/skills/acem-cost-estimation
+ln -s "$(pwd)/skill/estimate-acem-cost" ~/.claude/skills/estimate-acem-cost
 ```
-Then invoke with `/acem-cost-estimation` or just ask a qualifying question —
+Then invoke with `/estimate-acem-cost` or just ask a qualifying question —
 the skill activates automatically.
 
 **Codex** — add an entry to your plugin marketplace
@@ -110,8 +110,8 @@ the skill activates automatically.
   "interface": { "displayName": "Personal Plugins" },
   "plugins": [
     {
-      "name": "acem-cost-estimation",
-      "source": { "source": "local", "path": "/absolute/path/to/estimator/skill/acem-cost-estimation/" },
+      "name": "estimate-acem-cost",
+      "source": { "source": "local", "path": "/absolute/path/to/estimate-acem-cost/skill/estimate-acem-cost/" },
       "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
       "category": "Productivity"
     }
@@ -121,25 +121,25 @@ the skill activates automatically.
 
 **Antigravity** — copy into the global or workspace skills directory:
 ```bash
-cp -r skill/acem-cost-estimation ~/.gemini/antigravity/skills/acem-cost-estimation   # global
-cp -r skill/acem-cost-estimation .agents/skills/acem-cost-estimation                 # workspace-only
+cp -r skill/estimate-acem-cost ~/.gemini/antigravity/skills/estimate-acem-cost   # global
+cp -r skill/estimate-acem-cost .agents/skills/estimate-acem-cost                 # workspace-only
 ```
 
 **Gemini CLI** — install the extension directly from this repo:
 ```bash
-gemini extensions install https://github.com/keithmackay/estimator
+gemini extensions install https://github.com/keithmackay/estimate-acem-cost
 ```
 (Gemini CLI extensions install from a repo root; if that doesn't pick up the
 skill automatically, clone the repo and point Gemini CLI at the
-`skill/acem-cost-estimation/` subdirectory instead.)
+`skill/estimate-acem-cost/` subdirectory instead.)
 
 Full per-platform detail, a compatibility matrix, and platform doc links live
-in `skill/acem-cost-estimation/README.md`.
+in `skill/estimate-acem-cost/README.md`.
 
 ## Usage
 
 Inside a Claude Code session, ask it to estimate agentic build cost for a
-codebase or planned project — the `acem-cost-estimation` skill activates
+codebase or planned project — the `estimate-acem-cost` skill activates
 automatically:
 
 > "What would it have cost an AI agent to build this codebase?"
@@ -147,16 +147,16 @@ automatically:
 Or run the calculator directly against a JSON task breakdown:
 
 ```bash
-python3 skill/acem-cost-estimation/acem_calculate.py \
-  skill/acem-cost-estimation/references/example_input.json
+python3 skill/estimate-acem-cost/acem_calculate.py \
+  skill/estimate-acem-cost/references/example_input.json
 ```
 
 For a cost range instead of a single figure, run a Monte Carlo simulation
 over inputs expressed as `{"low": a, "mode": m, "high": b}` distributions:
 
 ```bash
-python3 skill/acem-cost-estimation/acem_calculate.py \
-  skill/acem-cost-estimation/references/example_input_advanced.json \
+python3 skill/estimate-acem-cost/acem_calculate.py \
+  skill/estimate-acem-cost/references/example_input_advanced.json \
   --montecarlo 3000 --seed 42
 ```
 
@@ -164,13 +164,13 @@ To flag calibration constants that are stale, underpowered, or tied to a
 superseded agent version:
 
 ```bash
-python3 skill/acem-cost-estimation/acem_calculate.py \
-  skill/acem-cost-estimation/references/example_input_advanced.json \
-  --calibration-log skill/acem-cost-estimation/references/calibration_log_example.json
+python3 skill/estimate-acem-cost/acem_calculate.py \
+  skill/estimate-acem-cost/references/example_input_advanced.json \
+  --calibration-log skill/estimate-acem-cost/references/calibration_log_example.json
 ```
 
-See `skill/acem-cost-estimation/SKILL.md` for the full input schema and
-workflow, and `skill/acem-cost-estimation/references/acem-paper-summary.md`
+See `skill/estimate-acem-cost/SKILL.md` for the full input schema and
+workflow, and `skill/estimate-acem-cost/references/acem-paper-summary.md`
 for a condensed reference of the underlying formulas.
 
 ## Architecture
@@ -179,12 +179,12 @@ for a condensed reference of the underlying formulas.
 |---|---|
 | `docs/2608.02582v1.pdf` | The source paper: "ACEM: A Cost Estimation Model for Agentic Software Engineering" (El-Ramly, 2026) |
 | `docs/ACEM_OPPORTUNITIES.md` | Analysis of the model's assumptions, gaps, and opportunities to strengthen it |
-| `skill/acem-cost-estimation/SKILL.md` | The skill's workflow (Claude Code / Antigravity native format): how to inventory a codebase and map it to ACEM's cost formulas |
-| `skill/acem-cost-estimation/acem_calculate.py` | Calculator implementing ACEM's formulas, plus Monte Carlo, non-stationary parameters, parallel pipelines, and calibration tracking |
-| `skill/acem-cost-estimation/references/` | Formula reference and worked example inputs |
-| `skill/acem-cost-estimation/.codex-plugin/`, `skills/` | Codex plugin manifest and skill copy |
-| `skill/acem-cost-estimation/gemini-extension.json`, `GEMINI.md` | Gemini CLI extension manifest and context-file include |
-| `skill/acem-cost-estimation/README.md` | Per-platform install instructions and compatibility matrix for the skill itself |
+| `skill/estimate-acem-cost/SKILL.md` | The skill's workflow (Claude Code / Antigravity native format): how to inventory a codebase and map it to ACEM's cost formulas |
+| `skill/estimate-acem-cost/acem_calculate.py` | Calculator implementing ACEM's formulas, plus Monte Carlo, non-stationary parameters, parallel pipelines, and calibration tracking |
+| `skill/estimate-acem-cost/references/` | Formula reference and worked example inputs |
+| `skill/estimate-acem-cost/.codex-plugin/`, `skills/` | Codex plugin manifest and skill copy |
+| `skill/estimate-acem-cost/gemini-extension.json`, `GEMINI.md` | Gemini CLI extension manifest and context-file include |
+| `skill/estimate-acem-cost/README.md` | Per-platform install instructions and compatibility matrix for the skill itself |
 
 ## Development
 
@@ -192,8 +192,8 @@ There's no build step or test suite yet — the calculator is a single
 dependency-free Python script. To sanity-check changes:
 
 ```bash
-python3 skill/acem-cost-estimation/acem_calculate.py \
-  skill/acem-cost-estimation/references/example_input.json
+python3 skill/estimate-acem-cost/acem_calculate.py \
+  skill/estimate-acem-cost/references/example_input.json
 ```
 
 Compare the output against `docs/2608.02582v1.pdf` Tables 5–6 for the

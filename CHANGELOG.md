@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+- Rename skill from acem-cost-estimation to estimate-acem-cost throughout (folder, invocation, manifests, README)
 - Add --version flag support, reporting installed version and a best-effort GitHub update check
 - Add Changelog section to README linking CHANGELOG.md
 - Add --help flag convention (help.md)

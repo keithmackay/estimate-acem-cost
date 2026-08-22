@@ -1,7 +1,7 @@
 # Opportunities to Strengthen the ACEM Cost Estimation Model
 
 > Bundled copy for skill portability — canonical source is
-> `docs/ACEM_OPPORTUNITIES.md` in the [estimator repo](https://github.com/keithmackay/estimator).
+> `docs/ACEM_OPPORTUNITIES.md` in the [estimator repo](https://github.com/keithmackay/estimate-acem-cost).
 
 Analysis of "ACEM: A Cost Estimation Model for Agentic Software Engineering"
 (El-Ramly, 2026; [arXiv:2608.02582](https://arxiv.org/abs/2608.02582)). The
@@ -196,9 +196,9 @@ that step is the single highest-leverage thing that could happen to it next.
    that direction, and documents it clearly as an extension rather than
    something the original paper claims to support.
 
-Implementation: `skill/acem-cost-estimation/acem_calculate.py` and
-`skill/acem-cost-estimation/SKILL.md`. See
-`skill/acem-cost-estimation/references/example_input_advanced.json` for a
+Implementation: `skill/estimate-acem-cost/acem_calculate.py` and
+`skill/estimate-acem-cost/SKILL.md`. See
+`skill/estimate-acem-cost/references/example_input_advanced.json` for a
 worked example exercising all of #2–#7 together.
 
 > [!NOTE]
