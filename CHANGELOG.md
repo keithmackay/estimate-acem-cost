@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-20
+
 - Document mackayi marketplace installation in README
 - Rename skill from acem-cost-estimation to estimate-acem-cost throughout (folder, invocation, manifests, README)
 - Add --version flag support, reporting installed version and a best-effort GitHub update check
